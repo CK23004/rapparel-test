@@ -1,6 +1,8 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from django.contrib.auth.models import AbstractUser
 import uuid
+from django.db import IntegrityError
 from django.utils.text import slugify
 import datetime
 # User Model
@@ -45,20 +47,28 @@ class Brand(models.Model):
 
 # Store Model
 class Store(models.Model):
+    INVENTORY_SOFTWARE_CHOICES = [
+        ('Excel', 'Excel'),
+        ('Software1', 'Software1'),
+        ('Software2', 'Software2'),
+    ]
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255, unique=True)  # Ensure store name is unique
     slug = models.SlugField(max_length=255, unique=True, blank=True, null=True)
 
-    address = models.TextField()
+    street_address = models.CharField(max_length=255,blank=True, null=True)
+    city = models.CharField(max_length=100,blank=True, null=True)
+    state = models.CharField(max_length=100,blank=True, null=True)
+    pin_code = models.CharField(max_length=20,blank=True, null=True)
+    country = models.CharField(max_length=100,blank=True, null=True)
     latitude = models.DecimalField(max_digits=9, decimal_places=6)
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
-    contact_number = models.CharField(max_length=15)
     owner_name = models.CharField(max_length=255)
     owner_contact = models.CharField(max_length=15)
     contact_person_name = models.CharField(max_length=255, blank=True, null=True)
     contact_person_number = models.CharField(max_length=15, blank=True, null=True)
     display_image = models.ImageField(upload_to='store_images/', blank=True, null=True)
-    inventory_software = models.CharField(max_length=255, blank=True, null=True)
+    inventory_software = models.CharField(max_length=255, choices=INVENTORY_SOFTWARE_CHOICES, default='Excel')  # Select box
     commission_rate = models.DecimalField(max_digits=5, decimal_places=2, help_text="Commission rate as a percentage")
     is_featured = models.BooleanField(default=False)  # Added field for featured stores
     categories = models.ManyToManyField(Category, related_name='stores')
@@ -76,12 +86,6 @@ class Store(models.Model):
 # Banner Model
 class Banner(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    title = models.CharField(max_length=255, null=True, blank=True)
-    tagline = models.CharField(max_length=555, null=True, blank=True)
-    button_text = models.CharField(max_length=100, blank=True, null=True)
-    button_link = models.URLField(blank=True, null=True)
-    image = models.ImageField(upload_to='banners/')
-    link = models.URLField(blank=True, null=True)
     place = models.CharField(max_length=255, choices=[
         ('primary', 'Primary'),
         ('secondary_one', 'Secondary One'),
@@ -89,6 +93,13 @@ class Banner(models.Model):
         ('secondary_three', 'Secondary Three'),
         # Add more places as needed
     ])
+    title = models.CharField(max_length=255, null=True, blank=True)
+    tagline = models.CharField(max_length=555, null=True, blank=True)
+    button_text = models.CharField(max_length=100, blank=True, null=True)
+    button_link = models.URLField(blank=True, null=True)
+    image = models.ImageField(upload_to='banners/')
+    link = models.URLField(blank=True, null=True)
+    
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -100,7 +111,6 @@ class Attribute(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255, unique=True)  # e.g., Size, Color, Material
     description = models.TextField(blank=True, null=True)  # Optional
-
     def __str__(self):
         return self.name
 
@@ -121,7 +131,7 @@ class Product(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255,unique=True)
     slug = models.SlugField(max_length=255, unique=True, blank=True)
-    inventory = models.ForeignKey('Inventory', related_name='inventory', on_delete=models.CASCADE)
+    inventory = models.IntegerField(default=0, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     mrp = models.DecimalField(max_digits=10, decimal_places=2)
     sale_price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -135,14 +145,29 @@ class Product(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
+            base_slug = slugify(self.name)
+            self.slug = base_slug
+            # Ensure unique slug
+            i = 1
+            while Product.objects.filter(slug=self.slug).exists():
+                self.slug = f"{base_slug}-{i}"
+                i += 1
         super(Product, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.name
 
     def get_similar_products(self):
-        return Product.objects.filter(store=self.store, category=self.category).exclude(id=self.id)[:4]
+        return Product.objects.filter(store=self.store, category=self.category).exclude(id=self.id).order_by('-created_at')[:4]
+
+    def clean(self):
+        if self.sale_price > self.mrp:
+            raise ValidationError("Sale price cannot be greater than the MRP.")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()  # Ensure clean method is called
+        super(Product, self).save(*args, **kwargs)
+
 
 #for product gallery
 class ProductImage(models.Model):
@@ -241,11 +266,16 @@ class Order(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, related_name='orders', on_delete=models.CASCADE)
-    address = models.ForeignKey(Address, related_name='orders', on_delete=models.CASCADE)
-    payment_method = models.CharField(max_length=50)
+    # address = models.ForeignKey(Address, related_name='orders', on_delete=models.CASCADE)
+    street_address = models.CharField(max_length=255,blank=True, null=True)
+    city = models.CharField(max_length=100,blank=True, null=True)
+    state = models.CharField(max_length=100,blank=True, null=True)
+    pin_code = models.CharField(max_length=20,blank=True, null=True)
+    country = models.CharField(max_length=100,blank=True, null=True)
+    # payment_method = models.CharField(max_length=50)
     store = models.ForeignKey(Store, related_name='orders', on_delete=models.SET_NULL, null=True)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    payment_status = models.CharField(max_length=20, choices=(('Pending', 'Pending'), ('Completed', 'Completed')))
+    payment_status = models.CharField(max_length=20, choices=(('Pending', 'Pending'), ('Completed', 'Completed')),default='pending' )
     tracking_id = models.CharField(max_length=255, blank=True, null=True)  # Tracking ID from the shipping partner
     delivery_status = models.CharField(max_length=50, blank=True, null=True) #delivery status from the same
     order_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending') #incomplete (integration with delivery partner system)
@@ -291,10 +321,10 @@ class Coupon(models.Model):
     exclude_sale_items = models.BooleanField(default=False)
     
     # # Relationships to products and categories
-    # specific_products = models.ManyToManyField('Product', related_name='coupons', blank=True)
-    # exclude_products = models.ManyToManyField('Product', related_name='excluded_coupons', blank=True)
-    # specific_categories = models.ManyToManyField('Category', related_name='category_coupons', blank=True)
-    # exclude_categories = models.ManyToManyField('Category', related_name='excluded_category_coupons', blank=True)
+    specific_products = models.ManyToManyField('Product', related_name='coupons', blank=True)
+    exclude_products = models.ManyToManyField('Product', related_name='excluded_coupons', blank=True)
+    specific_categories = models.ManyToManyField('Category', related_name='category_coupons', blank=True)
+    exclude_categories = models.ManyToManyField('Category', related_name='excluded_category_coupons', blank=True)
     
     # Usage limits
     usage_limit_per_coupon = models.PositiveIntegerField(null=True, blank=True)

@@ -8,9 +8,13 @@
         "src": "staticfiles/**/*",
         "use": "@vercel/static"
       }
+ 
 ]
     
     ,
+    "scripts": {
+  "start": "python3 manage.py migrate && python3 manage.py runserver"
+},
     "routes": [
         {
             "src": "/(.*)",

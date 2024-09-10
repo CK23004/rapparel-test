@@ -103,8 +103,7 @@ class LandingPageView(APIView):
             'saved_addresses': [f"{addr.street_address}, {addr.city}, {addr.state}, {addr.country}" for addr in saved_addresses],
             'nearby_stores': stores_serializer.data,
         }
-        return Response(data, status=status.HTTP_200_OK)
-
+        return Response(data, status=200)
 
 #when clicked on category this view will be rendered...
 class CategoryStoresView(APIView):

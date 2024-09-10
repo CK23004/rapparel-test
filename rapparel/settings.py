@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 import os
+import dj_database_url
+
 #change as per email provider
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.google.com' 
@@ -44,6 +46,15 @@ DATABASES = {
     }
 }
 
+DATABASE_URL = os.getenv('POSTGRES_URL')
+if DATABASE_URL:
+    DATABASES['default'] = dj_database_url.config(default=DATABASE_URL, conn_max_age=600)
+
+# Optional: Disable SSL for development (if POSTGRES_URL_NO_SSL is present)
+if os.getenv('POSTGRES_URL_NO_SSL'):
+    DATABASES['default']['OPTIONS'] = {
+        'sslmode': 'disable',
+    }
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 

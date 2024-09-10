@@ -38,10 +38,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DATABASE'),  # Use POSTGRES_DATABASE for the database name
-        'USER': os.getenv('POSTGRES_USER'),  # Use POSTGRES_USER for the database user
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),  # Use POSTGRES_PASSWORD for the password
-        'HOST': os.getenv('POSTGRES_HOST'),  # Use POSTGRES_HOST for the database host
+        'NAME': 'verceldb',  # Use POSTGRES_DATABASE for the database name
+        'USER': 'default',  # Use POSTGRES_USER for the database user
+        'PASSWORD': 'b5HERho0cIux',  # Use POSTGRES_PASSWORD for the password
+        'HOST': 'ep-jolly-haze-a4k7ak4t-pooler.us-east-1.aws.neon.tech',  # Use POSTGRES_HOST for the database host
         'PORT': '5432',  # PostgreSQL default port, unless specified differently
     }
 }

@@ -46,15 +46,15 @@ DATABASES = {
     }
 }
 
-DATABASE_URL = os.getenv('POSTGRES_URL')
-if DATABASE_URL:
-    DATABASES['default'] = dj_database_url.config(default=DATABASE_URL, conn_max_age=600)
+# DATABASE_URL = os.getenv('POSTGRES_URL')
+# if DATABASE_URL:
+#     DATABASES['default'] = dj_database_url.config(default=DATABASE_URL, conn_max_age=600)
 
-# Optional: Disable SSL for development (if POSTGRES_URL_NO_SSL is present)
-if os.getenv('POSTGRES_URL_NO_SSL'):
-    DATABASES['default']['OPTIONS'] = {
-        'sslmode': 'disable',
-    }
+# # Optional: Disable SSL for development (if POSTGRES_URL_NO_SSL is present)
+# if os.getenv('POSTGRES_URL_NO_SSL'):
+#     DATABASES['default']['OPTIONS'] = {
+#         'sslmode': 'require',
+#     }
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 

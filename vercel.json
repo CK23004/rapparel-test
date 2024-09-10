@@ -5,7 +5,7 @@
       "use": "@vercel/python",
       "config": { 
         "maxLambdaSize": "15mb", 
-        "runtime": "python3.9" 
+        "runtime": "python3.9"
       }
     },
     {
@@ -13,10 +13,9 @@
       "use": "@vercel/static"
     }
   ],
-  {
-  "buildCommand": "python manage.py collectstatic --noinput && python manage.py migrate"
-}
-  
+
+  "buildCommand": "python manage.py collectstatic --noinput && python manage.py migrate",
+
   "routes": [
     {
       "src": "/static/(.*)", 

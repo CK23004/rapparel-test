@@ -105,6 +105,7 @@ class LandingPageView(APIView):
         }
         return Response(data, status=200)
 
+
 #when clicked on category this view will be rendered...
 class CategoryStoresView(APIView):
     def get(self, request, *args, **kwargs):
@@ -656,7 +657,7 @@ class StaffDashboardView(APIView):
         return Response({"detail": "Welcome, Staff!"})
 
 
-
+#done
 #for media page need to check once... for admin view only
 class MediaPageView(APIView):
     permission_classes = [IsAdminUser]
@@ -735,6 +736,8 @@ class MediaPageView(APIView):
         else:
             return Response({"error": "No images were deleted. Please check the provided IDs."}, status=status.HTTP_400_BAD_REQUEST)
 
+
+#done
 class BannerView(APIView):
     permission_classes = [IsAdminUser]
     parser_classes = (MultiPartParser, FormParser)
@@ -775,6 +778,7 @@ class BannerView(APIView):
         except Banner.DoesNotExist:
             return Response({"error": "Banner not found."}, status=status.HTTP_404_NOT_FOUND)
 
+#users list done
 #Customer_List view 
 class CustomerListView(APIView):
     permission_classes = [IsAdminUser]
@@ -788,6 +792,7 @@ class CustomerListView(APIView):
 def dash_customer(request):
     return render(request,'test.html')
 
+#done
 #coupons page
 class CouponListView(APIView):
     def get(self, request, format=None):
@@ -822,7 +827,7 @@ class CouponDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-#for apply coupon button for user
+#for apply coupon button for user (cart page or checkout page)
 class ApplyCouponView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -835,6 +840,8 @@ class ApplyCouponView(APIView):
         else:
             return Response({"error": message}, status=400)
         
+
+#done
 # for vendor page
 class VendorListView(generics.ListCreateAPIView):
     permission_classes = [IsAdminUser]
@@ -842,6 +849,7 @@ class VendorListView(generics.ListCreateAPIView):
     queryset = Store.objects.all()
     serializer_class = StoreSerializer
     parser_classes = (MultiPartParser, FormParser)
+#done
 
 class VendorDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAdminUser]
@@ -850,8 +858,10 @@ class VendorDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = StoreSerializer
     lookup_field = 'id'
     parser_classes = (MultiPartParser, FormParser)
+#done
 
 # for category page
+#done
 class CategoryListView(generics.ListCreateAPIView):
     permission_classes = [IsAdminUser]
 
@@ -859,6 +869,7 @@ class CategoryListView(generics.ListCreateAPIView):
     serializer_class = CategorySerializer
     parser_classes = (MultiPartParser, FormParser)
 
+#done
 class CategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAdminUser]
 
@@ -867,11 +878,13 @@ class CategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
     parser_classes = (MultiPartParser, FormParser)
 
 # for brand page
+#done
 class BrandListView(generics.ListCreateAPIView):
     queryset = Brand.objects.all()
     serializer_class = BrandSerializer
     parser_classes = (MultiPartParser, FormParser)  # Include these if handling image uploads
 
+#done
 class BrandDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Brand.objects.all()
     serializer_class = BrandSerializer

@@ -1,37 +1,26 @@
 {
-  "builds": [
+    "builds": [{
+        "src": "rapparel/wsgi.py",
+        "use": "@vercel/python",
+        "config": { "maxLambdaSize": "15mb", "runtime": "python3.9" }
+    },
     {
-      "src": "rapparel/wsgi.py",
-      "use": "@vercel/python"
-      "config": {
-        "zeroConfig": true
+        "src": "staticfiles/**/*",
+        "use": "@vercel/static"
       }
-    },
-    {
-      "src": "staticfiles/**/*",
-      "use": "@vercel/static"
-    },
+]
     
-    
-  ],
-  "post-build": [
-    "python manage.py collectstatic --noinput"
-  ],
-  "routes": [
-    {
-      "src": "/static/(.*)",
-      "dest": "/staticfiles/$1"
-    }
-  ]
-    "headers": [
-    {
-      "source": "/static/(.*).(css|js|png|jpg|jpeg|gif|svg|woff2?)",
-      "headers": [
+    ,
+    "routes": [
         {
-          "key": "Content-Type",
-          "value": "text/css"   // Or appropriate MIME type
-        }
-      ]
-    }
-  ]
+            "src": "/(.*)",
+            "dest": "rapparel/wsgi.py"
+        },
+        {
+            "src": "/static/(.*)",
+            "dest": "/staticfiles/$1"
+          }
+    ]
 }
+
+

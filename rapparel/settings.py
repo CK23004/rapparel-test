@@ -36,11 +36,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB'),  # Fetches from environment variable
-        'USER': os.getenv('POSTGRES_USER'),  # Fetches from environment variable
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),  # Fetches from environment variable
-        'HOST': os.getenv('POSTGRES_HOST'),  # Fetches from environment variable
-        'PORT': os.getenv('POSTGRES_PORT', '5432'),  # Defaults to 5432 if not set
+        'NAME': os.getenv('POSTGRES_DATABASE'),  # Use POSTGRES_DATABASE for the database name
+        'USER': os.getenv('POSTGRES_USER'),  # Use POSTGRES_USER for the database user
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),  # Use POSTGRES_PASSWORD for the password
+        'HOST': os.getenv('POSTGRES_HOST'),  # Use POSTGRES_HOST for the database host
+        'PORT': '5432',  # PostgreSQL default port, unless specified differently
     }
 }
 

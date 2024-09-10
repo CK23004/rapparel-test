@@ -55,24 +55,23 @@ class StoreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Store
         fields = [
-            'id', 'name', 'address', 'latitude', 'longitude', 'contact_number',
-            'owner_name', 'owner_contact', 'contact_person_name', 'contact_person_number',
-            'display_image', 'inventory_software', 'commission_rate', 'brands', 'categories', 'slug',
-            'brand_ids', 'category_ids'  # include IDs for write operations
+            'id', 'name', 'street_address', 'city', 'state', 'pin_code', 'country', 
+            'display_image', 'brands', 'categories', 'slug', 
+            'brand_ids', 'category_ids'
         ]
     
-    def create(self, validated_data):
-        brands = validated_data.pop('brands', [])
-        categories = validated_data.pop('categories', [])
-        store = Store.objects.create(**validated_data)
-        store.brands.set(brands)
-        store.categories.set(categories)
-        return store
+    # def create(self, validated_data):
+    #     brands = validated_data.pop('brands', [])
+    #     categories = validated_data.pop('categories', [])
+    #     store = Store.objects.create(**validated_data)
+    #     store.brands.set(brands)
+    #     store.categories.set(categories)
+    #     return store
 
-    def update(self, instance, validated_data):
-        instance.brands.set(validated_data.pop('brands', []))
-        instance.categories.set(validated_data.pop('categories', []))
-        return super().update(instance, validated_data)
+    # def update(self, instance, validated_data):
+    #     instance.brands.set(validated_data.pop('brands', []))
+    #     instance.categories.set(validated_data.pop('categories', []))
+    #     return super().update(instance, validated_data)
 
 
 class AttributeValueSerializer(serializers.ModelSerializer):

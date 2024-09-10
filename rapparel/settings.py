@@ -31,15 +31,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Check if running on Vercel or locally
-if os.getenv('VERCEL'):
-    DATABASE_PATH = '/tmp/db.sqlite3'  # Vercel's writable directory
-else:
-    DATABASE_PATH = os.path.join(BASE_DIR, 'db.sqlite3')  # Local development path
+
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': DATABASE_PATH,
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('POSTGRES_DB'),  # Fetches from environment variable
+        'USER': os.getenv('POSTGRES_USER'),  # Fetches from environment variable
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),  # Fetches from environment variable
+        'HOST': os.getenv('POSTGRES_HOST'),  # Fetches from environment variable
+        'PORT': os.getenv('POSTGRES_PORT', '5432'),  # Defaults to 5432 if not set
     }
 }
 

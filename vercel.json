@@ -3,11 +3,19 @@
     {
       "src": "manage.py",
       "use": "@vercel/python"
+      "config": {
+        "zeroConfig": true
+      }
     },
     {
       "src": "staticfiles/**/*",
       "use": "@vercel/static"
-    }
+    },
+    
+    
+  ],
+  "post-build": [
+    "python manage.py collectstatic --noinput"
   ],
   "routes": [
     {

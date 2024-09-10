@@ -27,8 +27,21 @@ DEFAULT_FROM_EMAIL = 'info@rapparel.com'
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+# BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Check if running on Vercel or locally
+if os.getenv('VERCEL'):
+    DATABASE_PATH = '/tmp/db.sqlite3'  # Vercel's writable directory
+else:
+    DATABASE_PATH = os.path.join(BASE_DIR, 'db.sqlite3')  # Local development path
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': DATABASE_PATH,
+    }
+}
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -125,12 +138,12 @@ WSGI_APPLICATION = 'rapparel.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(os.environ.get('DATABASE_DIR', BASE_DIR), 'db.sqlite3'),
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(os.environ.get('DATABASE_DIR', BASE_DIR), 'db.sqlite3'),
+#     }
+# }
 
 
 # Password validation
